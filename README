@@ -1,0 +1,20 @@
+How to install:
+
+This installs like a normal plugin, but uploaded files which fail the virus check will silently fail.
+To fix this by showing a message, open ojs/templates/author/submit/step2.tpl and replace line 50
+onwards with this:
+
+{else}
+<tr valign="top">
+	<td colspan="2" class="nodata">
+
+{* 2011-11-21 Niall Douglas Start *}
+{if $smarty.session.hasVirus}<span style="color:red;">{$smarty.session.virusScanMsg|escape}</span>{else}{translate key="author.submit.noSubmissionFile"}{/if}
+{* 2011-11-21 Niall Douglas End *}
+
+</td>
+</tr>
+{/if}
+
+
+Obviously without ClamAV's daemon running it will refuse all files :)
