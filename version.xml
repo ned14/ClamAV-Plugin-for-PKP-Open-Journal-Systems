@@ -10,10 +10,10 @@
   * Plugin version information.
   -->
 <version>
-	<application>ClamAV</application>
+	<application>ClamAV for OJS</application>
 	<type>plugins.generic</type>
-	<release>0.0.0.1</release>
-	<date>2011-11-10</date>
+	<release>1.0.0.0</release>
+	<date>2011-11-25</date>
 	<lazy-load>1</lazy-load>
 	<class>ClamAVPlugin</class>
 </version>

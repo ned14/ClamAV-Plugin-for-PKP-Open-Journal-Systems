@@ -7,6 +7,7 @@
 
 import('classes.plugins.GenericPlugin'); 
 require_once('Clamd.php');
+include('config.inc');
 
 class ClamAVPlugin extends GenericPlugin { 
     function register($category, $path) { 
@@ -29,7 +30,6 @@ class ClamAVPlugin extends GenericPlugin {
     } 
 
     function callback($hookName, $args) { 
-//throw new Exception("hello. filename = $fileName, type = $type, fileid = £fileId, $result = $result");
         $fileName  =& $args[0];
         $type      =& $args[1];
         $fileId    =& $args[2];
@@ -38,7 +38,7 @@ class ClamAVPlugin extends GenericPlugin {
 
         // Ask ClamAV for a verdict on $_FILES[$fileName]['tmp_name']
         ini_set('error_reporting',E_ALL);
-        $clam = new Net_Clamd('unix:///tmp/clamd.socket');
+        $clam = new Net_Clamd(CLAMDSOCKET);
         $clam_version = $clam->version();
         if(!$clam_version) {
             $hasVirus = true;
@@ -46,20 +46,27 @@ class ClamAVPlugin extends GenericPlugin {
 //throw new Exception("ClamAV is not running");
         }
         else {
-            $virus = $clam->scan($_FILES[$fileName]['tmp_name']);
+            if(CLAMDISLOCAL) {
+                $virus = $clam->scan($_FILES[$fileName]['tmp_name']);
+            }
+            else {
+                $data = file_get_contents($_FILES[$fileName]['tmp_name']);
+                $virus = $clam->instream($data);
+            }
             $hasVirus = ('OK'!=substr($virus, -2));
-            $virusScanMsg = 'ClamAV version '.clam_get_version().' says: ';
-            if(!hasVirus)
+            $virus=substr(strstr($virus, ': '), 2);
+            $virusScanMsg = 'ClamAV version '.$clam_version.' says: ';
+            if(!$hasVirus)
                 $virusScanMsg=$virusScanMsg.'No virus found';
             else
                 $virusScanMsg=$virusScanMsg.$virus;
         }
+//$hasVirus=true;
         $session =& Request::getSession();
         $session->setSessionVar('hasVirus', $hasVirus);
         $session->setSessionVar('virusScanMsg', $virusScanMsg);
 //setcookie('hasVirus', $hasVirus);
 //setcookie('virusScanMsg', $virusScanMsg);
-
         if($hasVirus) {
             $result = false;
             return true;

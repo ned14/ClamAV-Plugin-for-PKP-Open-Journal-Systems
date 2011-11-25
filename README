@@ -1,5 +1,16 @@
-How to install:
+ClamAV Plugin for Open Journal Systems v1.00
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+(C) 2011 Niall Douglas http://www.nedproductions.biz/
 
+Please find enclosed a ClamAV plugin for PKP's OJS. It scans uploaded files for viruses, and if found
+refuses to let them upload.
+
+Thanks are due to Hiroaki Kawai for his Clamd PHP plugin (http://openpear.org/package/Net_Clamd).
+
+This plugin resides under a BSD licence.
+
+How to install:
+---------------
 This installs like a normal plugin, but uploaded files which fail the virus check will silently fail.
 To fix this by showing a message, open ojs/templates/author/submit/step2.tpl and replace line 50
 onwards with this:
@@ -17,4 +28,16 @@ onwards with this:
 {/if}
 
 
-Obviously without ClamAV's daemon running it will refuse all files :)
+Obviously without ClamAV's daemon running it will refuse all files :) To configure where the ClamAV
+daemon lives, you need to edit the config.inc file using WinSCP or equivalent.
+
+If your Clamd lives on the same machine, it makes sense to specify CLAMDISLOCAL as true such that
+Clamd may scan the uploaded file directly. If false, it will be read and sent over the Clamd socket.
+
+If your Clamd lives on the same machine, you almost certainly want to talk to it via its unix socket
+which probably is unix:///tmp/clamd.socket. If it lives elsewhere, you'll need to supply an IP and port.
+If you're hosted by the PKP, best ask them for where their Clamd is currently living.
+
+Let me know about any bugs via http://www.nedproductions.biz/ or http://www.nedprod.com/.
+
+Enjoy!
