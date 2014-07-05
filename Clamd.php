@@ -160,7 +160,31 @@ class Net_Clamd {
 		}
 		return false;
 	}
- 
+
+	/**
+	 * issue INSTREAM command against a file name.
+	 * @param $data string the data to test
+	 * @return string "stream: OK" will be returned if OK. false on failure.
+	 */ 
+	function filestream($file){
+		$handle = fopen($file, "rb");
+
+		if($f = $this->_open()){
+			fwrite($f, "zINSTREAM\0");
+			while (!feof($handle)) {
+				$data = fread($handle, 8192);
+				fwrite($f, pack("N",strlen($data)).$data);
+			}
+			fclose($handle);
+
+			fwrite($f, pack("N",0)); // chunk termination
+			$r = $this->_read($f);
+			fclose($f);
+			return $r;
+		}
+		return false;
+}
+
 	/**
 	 * issue STATS command
 	 * @return string The status information of clamd.
